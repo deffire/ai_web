@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Нейро-Веб: Создание сайта с помощью ИИ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           CSS ПЕРЕМЕННЫЕ (Для смены тем)
+           ========================================= */
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #0f172a;
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary-color: #1e293b;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --code-bg: #f1f5f9;
+            --placeholder-bg: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --primary-color: #60a5fa;
+            --primary-hover: #3b82f6;
+            --secondary-color: #cbd5e1;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --code-bg: #020617;
+            --placeholder-bg: #0f172a;
+        }
+
+        /* =========================================
+           БАЗОВЫЕ СТИЛИ
+           ========================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.7;
+        }
+
+        /* =========================================
+           НАВИГАЦИЯ (ШАПКА)
+           ========================================= */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover { color: var(--primary-color); }
+
+        .buttons-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: none;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        /* =========================================
+           ГЛАВНЫЙ ЭКРАН (HERO)
+           ========================================= */
+        .hero {
+            max-width: 800px;
+            margin: 120px auto 60px;
+            text-align: center;
+            padding: 0 2rem;
+        }
+
+        .hero h1 { font-size: 3rem; line-height: 1.2; margin-bottom: 1.5rem; }
+        .hero h1 span { color: var(--primary-color); }
+        .hero p { font-size: 1.2rem; color: var(--secondary-color); margin-bottom: 2rem; }
+
+        /* =========================================
+           КОНТЕНТНЫЕ СЕКЦИИ
+           ========================================= */
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 2rem 4rem; }
+
+        section {
+            margin-bottom: 4rem;
+            background-color: var(--card-bg);
+            padding: 3rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 { font-size: 2rem; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
+        h3 { font-size: 1.4rem; margin: 1.5rem 0 1rem; color: var(--primary-color); }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin-left: 1.5rem; margin-bottom: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+
+        /* =========================================
+           ОФОРМЛЕНИЕ ПРОМПТОВ И КОДА
+           ========================================= */
+        .prompt-container {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .prompt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--code-bg);
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .lang-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.95rem;
+            margin: 0;
+            color: var(--text-color);
+            white-space: pre-wrap;
+        }
+
+        .highlight { background-color: var(--primary-color); color: white; padding: 0.2rem 0.4rem; border-radius: 4px; }
+        
+        .prompt-en { display: none; } /* Скрыто по умолчанию */
+
+        /* =========================================
+           БЛОКИ ДЛЯ СКРИНШОТОВ (PLACEHOLDERS)
+           ========================================= */
+        .screenshot-box {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .screenshot-box img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 2px dashed var(--primary-color);
+            background-color: var(--placeholder-bg);
+            padding: 4px;
+            min-height: 200px; /* Чтобы пустой блок не схлопывался */
+            display: block;
+            margin: 0 auto;
+        }
+
+        .screenshot-caption {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            margin-top: 0.8rem;
+            font-style: italic;
+        }
+
+        /* =========================================
+           СОВЕТЫ И ЧАСТЫЕ ВОПРОСЫ (АККОРДЕОН)
+           ========================================= */
+        details {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            cursor: pointer;
+        }
+
+        summary {
+            font-weight: 600;
+            font-size: 1.1rem;
+            outline: none;
+            list-style: none; /* Убираем стандартный треугольник */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::-webkit-details-marker { display: none; } /* Для старых браузеров */
+
+        summary::after {
+            content: '+';
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        details[open] summary::after {
+            content: '−';
+            transform: rotate(180deg);
+        }
+
+        details[open] summary {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .faq-answer {
+            padding-left: 1rem;
+            border-left: 3px solid var(--primary-color);
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+        }
+
+        /* =========================================
+           ФУТЕР
+           ========================================= */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        /* =========================================
+           АДАПТИВНОСТЬ
+           ========================================= */
+        @media (max-width: 900px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 2.2rem; }
+            section { padding: 1.5rem; }
+            .buttons-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="#" class="logo">AI.Web</a>
+            <ul class="nav-links">
+                <li><a href="#ai-coding">Код</a></li>
+                <li><a href="#assets">Контент</a></li>
+                <li><a href="#domain">Домен</a></li>
+                <li><a href="#hosting">Хостинг</a></li>
+                <li><a href="#faq">Вопросы</a></li>
+            </ul>
+            <div class="buttons-group">
+                <button class="btn" onclick="toggleLang()" id="langBtn">Промпты: RU</button>
+                <button class="btn" onclick="toggleTheme()" id="themeBtn">Тема: Светлая</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h1>Создай свой сайт с нуля используя <span>Искусственный Интеллект</span></h1>
+            <p>Подробное руководство по созданию, дизайну, выбору домена и размещению сайта в сети без ручного написания кода.</p>
+        </div>
+
+        <div class="container">
+            
+            <section id="ai-coding">
+                <h2>Шаг 1: Генерация структуры и кода</h2>
+                <p>Современные языковые модели способны писать готовый HTML, CSS и JavaScript код. Главный секрет успеха — правильный <b>Промпт</b>.</p>
+                
+                <div class="screenshot-box">
+                    <img src="img/step1-create-file.jpg" alt="Создание текстового документа">
+                    <p class="screenshot-caption">Скриншот 1: Создание файла index.html на компьютере (через Блокнот или VS Code)</p>
+                </div>
+
+                <h3>Как писать запросы (Промпты)</h3>
+                <p>Описывай задачу как четкое техническое задание (ТЗ):</p>
+                
+                <div class="prompt-container">
+                    <div class="prompt-header">
+                        <span>Запрос для ИИ (Код сайта)</span>
+                        <span class="lang-badge" id="badge-code">RU</span>
+                    </div>
+                    <pre class="prompt-ru">Ты — Senior Frontend Developer. 
+Напиши код одностраничного сайта (HTML + CSS) для портфолио фотографа.
+Требования:
+1. Используй семантические теги HTML5.
+2. Цветовая палитра: черно-белая, минимализм.
+3. Добавь шапку с навигацией, блок "Обо мне", "Галерея" (сетка CSS Grid) и футер.
+4. Сделай сайт адаптивным для мобильных телефонов (@media queries).
+Код должен быть в одном файле.</pre>
+                    <pre class="prompt-en">You are a Senior Frontend Developer. 
+Write the code for a single-page website (HTML + CSS) for a photographer's portfolio.
+Requirements:
+1. Use semantic HTML5 tags.
+2. Color palette: black and white, minimalist.
+3. Add a header with navigation, "About Me" section, "Gallery" (CSS Grid), and a footer.
+4. Make the site mobile-responsive (@media queries).
+The code must be in a single file.</pre>
+                </div>
+                
+                <div class="screenshot-box">
+                    <img src="img/step1-ai-result.jpg" alt="Результат работы ИИ">
+                    <p class="screenshot-caption">Скриншот 2: Как выглядит сгенерированный ИИ код, который нужно скопировать</p>
+                </div>
+
+                <h3>Итеративный подход</h3>
+                <p>ИИ редко выдает идеальный результат с первого раза. Действуй по шагам:</p>
+                <ul>
+                    <li>Сначала сгенерируй только HTML-каркас.</li>
+                    <li>Попроси написать CSS стили для этого каркаса.</li>
+                    <li>Если что-то сломалось, отправь ИИ ошибку с текстом: <i>"Этот блок поехал на телефонах, исправь CSS"</i>.</li>
+                </ul>
+            </section>
+
+            <section id="assets">
+                <h2>Шаг 2: Контент и визуальные материалы</h2>
+                <p>Сайт не может состоять только из кода. Ему нужны тексты и картинки.</p>
+                
+                <h3>Генерация текста</h3>
+                <p>Указывай нейросети стиль текста: <i>"Напиши приветственный текст для сайта в дружелюбном стиле, без сложных терминов"</i>.</p>
+
+                <h3>Генерация изображений</h3>
+                <p>Для создания графики указывайте параметры стилистики, цвета и соотношение сторон:</p>
+                
+                <div class="prompt-container">
+                    <div class="prompt-header">
+                        <span>Запрос для ИИ (Картинки)</span>
+                        <span class="lang-badge" id="badge-img">RU</span>
+                    </div>
+                    <pre class="prompt-ru">Плоская векторная иллюстрация команды, работающей за ноутбуками, современный UI стиль, сине-серая цветовая палитра, белый фон --ar 16:9</pre>
+                    <pre class="prompt-en">Flat vector illustration of a team working on laptops, modern UI style, blue and grey color palette, white background --ar 16:9</pre>
+                </div>
+
+                <div class="screenshot-box">
+                    <img src="img/step2-images.jpg" alt="Сгенерированные картинки">
+                    <p class="screenshot-caption">Скриншот 3: Пример выдачи картинок в нейросети (например, Midjourney или Шедеврум)</p>
+                </div>
+            </section>
+
+            <section id="domain">
+                <h2>Шаг 3: Что такое домен и регистрация</h2>
+                <p>Домен — это имя вашего сайта в интернете (например, <span class="highlight">yoursite.com</span>).</p>
+
+                <h3>DNS-записи (Связь домена и хостинга)</h3>
+                <p>Чтобы домен открывал ваш сайт, нужно зайти в панель управления и прописать А-запись (IP-адрес сервера) или NS-серверы хостинга.</p>
+
+                <div class="screenshot-box">
+                    <img src="img/step3-dns-panel.jpg" alt="Панель DNS">
+                    <p class="screenshot-caption">Скриншот 4: Панель управления доменом (как выглядит настройка DNS записей)</p>
+                </div>
+            </section>
+
+            <section id="hosting">
+                <h2>Шаг 4: Размещение сайта (Хостинг)</h2>
+                <p>Для простых сайтов (HTML/CSS/JS) идеально подходит бесплатный хостинг на GitHub Pages.</p>
+                
+                <ol>
+                    <li>Создайте репозиторий на GitHub и загрузите `index.html`.</li>
+                    <li>В настройках (Settings) перейдите в раздел "Pages".</li>
+                    <li>В качестве источника (Branch) выберите "main" и нажмите Save.</li>
+                </ol>
+
+                <div class="screenshot-box">
+                    <img src="img/step4-github.jpg" alt="Настройки GitHub Pages">
+                    <p class="screenshot-caption">Скриншот 5: Страница настроек GitHub Pages (где нажимать кнопку Save и где появится ссылка)</p>
+                </div>
+            </section>
+
+            <section id="faq">
+                <h2>Советы и Частые вопросы</h2>
+                <p>Ответы на самые популярные вопросы при создании сайтов через ИИ.</p>
+
+                <details>
+                    <summary>Что делать, если ИИ выдал нерабочий код?</summary>
+                    <div class="faq-answer">
+                        <p>Ничего страшного. Скопируй тот кусок кода, который работает криво, отправь его обратно нейросети и напиши: "Этот код не работает, блок съезжает вправо. Исправь ошибку". ИИ сам найдет опечатку и выдаст правильный вариант.</p>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>Можно ли сделать сайт только с телефона?</summary>
+                    <div class="faq-answer">
+                        <p>Да. Ты можешь генерировать код в приложении ChatGPT, вставлять его в любой мобильный редактор кода (например, TrebEdit), а загружать файлы на GitHub Pages прямо через браузер телефона (режим версии для ПК).</p>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>Обязательно ли покупать платный домен?</summary>
+                    <div class="faq-answer">
+                        <p>Нет. Для школьного проекта или первого портфолио отлично подойдет бесплатная техническая ссылка, которую выдаст хостинг (например, tvoe-imya.github.io).</p>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>Как обновить сайт, если я изменил текст?</summary>
+                    <div class="faq-answer">
+                        <p>Просто открой свой файл index.html, измени нужный текст, сохрани, и загрузи этот файл обратно на GitHub (Upload files), заменив старый. Сайт обновится автоматически через 1-2 минуты.</p>
+                    </div>
+                </details>
+            </section>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Руководство по созданию web страниц с помощью ИИ.</p>
+    </footer>
+
+    <script>
+        // Инициализация темы при загрузке
+        const body = document.documentElement;
+        const themeBtn = document.getElementById('themeBtn');
+        
+        // Устанавливаем темную тему по умолчанию, как ты просил
+        body.setAttribute('data-theme', 'dark');
+        themeBtn.innerText = 'Тема: Темная';
+
+        // Функция переключения тем
+        function toggleTheme() {
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeBtn.innerText = 'Тема: Светлая';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeBtn.innerText = 'Тема: Темная';
+            }
+        }
+
+        // Функция переключения языка промптов (RU/EN)
+        let isRussian = true;
+        function toggleLang() {
+            isRussian = !isRussian;
+            const langBtn = document.getElementById('langBtn');
+            const ruPrompts = document.querySelectorAll('.prompt-ru');
+            const enPrompts = document.querySelectorAll('.prompt-en');
+            const badges = document.querySelectorAll('.lang-badge');
+
+            if (isRussian) {
+                langBtn.innerText = 'Промпты: RU';
+                ruPrompts.forEach(el => el.style.display = 'block');
+                enPrompts.forEach(el => el.style.display = 'none');
+                badges.forEach(el => el.innerText = 'RU');
+            } else {
+                langBtn.innerText = 'Промпты: EN';
+                ruPrompts.forEach(el => el.style.display = 'none');
+                enPrompts.forEach(el => el.style.display = 'block');
+                badges.forEach(el => el.innerText = 'EN');
+            }
+        }
+    </script>
+</body>
+</html>
